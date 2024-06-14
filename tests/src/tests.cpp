@@ -19,6 +19,7 @@
 #include <catch2/catch.hpp>
 
 #include "commandlinemanager.h"
+#include "stringtools.h"
 
 using std::map, std::string;
 
@@ -85,5 +86,20 @@ TEST_CASE("CommandLineManager - Detects help command")
         const map<string, string> params = {{"someother", "command"}};
         CommandLineManager manager(params);
         REQUIRE( manager.HandleHelpCommand() == false);
+    }
+}
+
+TEST_CASE("StringTools - Utf8ToUnicode")
+{
+    SECTION("Simple string")
+    {
+        auto converted = StringTools::Utf8ToUnicode("my string is simple");
+        REQUIRE( converted == L"my string is simple");
+    }
+
+    SECTION("Using accents")
+    {
+        auto converted = StringTools::Utf8ToUnicode("Oune Strïngue avé dé acceñtè por moí");
+        REQUIRE( converted == L"Oune Strïngue avé dé acceñtè por moí");
     }
 }

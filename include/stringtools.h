@@ -42,11 +42,9 @@ public:
 
 private:
 
-#ifndef USE_OLD_COMPILER
     static std::wstring RawUtf8ToUnicode(const std::string& utf8);
-#endif
 
-    static std::wstring SynologyUtf8ToUnicode(const std::string& utf8);
+    static std::vector<unsigned long> ToUnicodeVec(const std::string& utf8);
 
 #ifdef _WIN32
     static std::wstring WindowsUtf8ToUnicode(const std::string& utf8);
