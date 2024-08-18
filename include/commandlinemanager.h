@@ -38,6 +38,7 @@ class CommandLineManager
 {
 public:
     CommandLineManager(int argc, char* argv[]);
+    CommandLineManager(int argc, wchar_t* argv[]);
     CommandLineManager(const std::map<std::string, std::string>& parameters);
 
     // TODO Put a field just for param value.

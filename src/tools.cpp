@@ -1,12 +1,9 @@
 #include "tools.h"
 
 #include <algorithm>
-#include <locale>
 #include <time.h>
 #include <stdio.h>
-#include <sstream>
 
-#include "base64.h"
 #include "filetools.h"
 #include "stringtools.h"
 
@@ -128,6 +125,20 @@ void Tools::Wait(const int seconds)
 #else
    sleep(seconds);
 #endif
+}
+
+bool Tools::AreEqual(const WStringVec &list1, const WStringVec &list2)
+{
+   if (list1.size() != list2.size())
+      return false;
+
+   for (const auto& str1 : list1)
+   {
+      auto it = std::find(list2.begin(), list2.end(), str1);
+      if (it == list2.end())
+         return false;
+   }
+   return true;
 }
 
 

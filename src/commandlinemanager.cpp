@@ -19,8 +19,11 @@
 #include "commandlinemanager.h"
 
 #include <algorithm>
+#include <cstring>
 #include <iostream>
 #include <stdlib.h>
+
+#include "stringtools.h"
 
 using namespace std;
 
@@ -35,7 +38,30 @@ CommandLineManager::CommandLineManager(int argc,char* argv[]) :
     applicationName(""), applicationVersion(""), authorName(""), copyrightInfo(""),
     parameterColumnSize(0)
 {
-    BuildParametersMap(argc, argv);
+   BuildParametersMap(argc, argv);
+}
+
+CommandLineManager::CommandLineManager(int argc, wchar_t *argv[]) :
+  usingHelpCommand(false), usingVersionCommand(false),
+  applicationName(""), applicationVersion(""), authorName(""), copyrightInfo(""),
+  parameterColumnSize(0)
+{
+   char **convertedArgv = new char*[argc];
+   for (int i=0; i<argc; ++i)
+   {
+      const string currentArg = StringTools::UnicodeToUtf8(argv[i]);
+      convertedArgv[i] = new char[currentArg.size()];
+      strcpy(convertedArgv[i], currentArg.c_str());
+   }
+
+   BuildParametersMap(argc, convertedArgv);
+
+   for (int i=0; i<argc; ++i)
+   {
+      delete[] convertedArgv[i];
+   }
+   delete[] convertedArgv;
+
 }
 
 CommandLineManager::CommandLineManager(const std::map<string, string> &parameters)

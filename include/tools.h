@@ -39,6 +39,9 @@ public:
 
     static void Wait(const int seconds);
 
+   using WStringVec = std::vector<std::wstring>;
+   static bool AreEqual(const WStringVec& list1, const WStringVec& list2);
+
 
 protected:
     static FILE* RunExternalCommand(const std::wstring& commandName, bool redirectStdErr);
