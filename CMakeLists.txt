@@ -14,7 +14,9 @@ file(GLOB includes "${includeDir}/*")
 
 add_library(BasicToolsLib ${sources})
 
-add_subdirectory(tests)
+if(BuildTests)
+  add_subdirectory(tests)
+endif(BuildTests)
 
 target_include_directories(BasicToolsLib PUBLIC "${includeDir}")
 
