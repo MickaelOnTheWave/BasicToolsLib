@@ -12,7 +12,7 @@ set(includeDir "${projectRoot}/include")
 file(GLOB sources "${srcDir}/*")
 file(GLOB includes "${includeDir}/*")
 
-add_library(BasicToolsLib ${sources})
+add_library(BasicToolsLib ${sources} ${includes})
 
 if(BuildTests)
   add_subdirectory(tests)
