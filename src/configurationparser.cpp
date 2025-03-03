@@ -1,6 +1,5 @@
 #include "configurationparser.h"
 
-#include <fstream>
 #include <iostream>
 #include <sstream>
 
@@ -233,6 +232,12 @@ bool ConfigurationParser::Parse_AwaitingDeclaration(const std::wstring& dataChun
 
          GetCurrentObject()->SetProperty(atom, atom2);
          return true;
+      }
+      else
+      {
+         const std::wstring message = L"Syntax error : Unexpected symbol ";
+         errors.push_back(message + symbol);
+         return false;
       }
    }
 }
