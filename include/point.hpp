@@ -1,13 +1,15 @@
 #ifndef POINT_H
 #define POINT_H
 
-#include <vector>
-
 template<typename T, int D = 2>
 class Point
 {
 public:
     Point();
+
+    void SetX(const T value);
+    void SetY(const T value);
+    void SetZ(const T value);
 
     T x() const;
     T y() const;
