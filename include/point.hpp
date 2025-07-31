@@ -1,6 +1,8 @@
 #ifndef POINT_H
 #define POINT_H
 
+#include <vector>
+
 template<typename T, int D = 2>
 class Point
 {
