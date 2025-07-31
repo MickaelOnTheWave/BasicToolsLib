@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(Catch2 REQUIRED)
 
-add_executable(BasicToolsTests src/tests.cpp)
+add_executable(BasicToolsTests src/tests.cpp src/filetoolstests.cpp)
 target_link_libraries(BasicToolsTests BasicToolsLib Catch2::Catch2WithMain)
 
 include(CTest)
