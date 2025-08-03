@@ -24,7 +24,8 @@ using namespace std;
 
 /*******************/
 
-namespace  {
+namespace
+{
    void CreatePopulatedFolder(const wstring& folderName)
    {
       if (FileTools::FolderExists(folderName))
@@ -36,6 +37,23 @@ namespace  {
       const wstring dummyFile = folderName + L"/dummyFile.txt";
       const wstring dummyContent = L"Lalalala";
       ok = FileTools::WriteBufferToFile(dummyFile, dummyContent);
+      REQUIRE(ok == true);
+   }
+
+   void TestReadAndWrite(const wstring& filename, const wstring& content)
+   {
+      const bool fileAlreadyExists = FileTools::FileExists(filename);
+      REQUIRE(fileAlreadyExists == false);
+
+      bool ok = FileTools::WriteBufferToFile(filename, content);
+      REQUIRE(ok == true);
+
+      wstring readContent;
+      ok = FileTools::GetTextFileContent(filename, readContent);
+      REQUIRE(ok == true);
+      REQUIRE(content == readContent);
+
+      ok = FileTools::RemoveFile(filename);
       REQUIRE(ok == true);
    }
 }
@@ -147,4 +165,36 @@ TEST_CASE("FileTools - RemoveFolder() - Without root")
    const wstring dummyFile = testFolder + L"/dummyFile.txt";
    exists = FileTools::FolderExists(dummyFile);
    REQUIRE(exists == false);
+}
+
+TEST_CASE("FileTools - WriteBufferToFile()/GetTextFileContent() - ascii data")
+{
+   const wstring testFilename = L"testfile";
+   const wstring testContent = L"This\nis\ndummy\ndata";
+   TestReadAndWrite(testFilename, testContent);
+}
+
+TEST_CASE("FileTools - WriteBufferToFile()/GetTextFileContent() - unicode data")
+{
+   const wstring testFilename = L"testfíle";
+   const wstring testContent = L"This\nis\ndummy\n\nuníc@de datã éééé";
+   TestReadAndWrite(testFilename, testContent);
+}
+
+TEST_CASE("FileTools - WriteBufferToFile() - unicode path")
+{
+   const wstring testFilename = L"Micka\x00ebl/fileWithUnicodeFolderInPath2.txt";
+
+   if (FileTools::FileExists(testFilename))
+   {
+      const bool ok = FileTools::RemoveFile(testFilename);
+      REQUIRE(ok == true);
+   }
+
+   const bool ok = FileTools::WriteBufferToFile(testFilename, L"dummy data");
+   REQUIRE(ok == true);
+
+   REQUIRE(FileTools::FileExists(testFilename) == true);
+
+   FileTools::RemoveFile(testFilename);
 }
