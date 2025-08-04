@@ -62,6 +62,8 @@ namespace
 
 TEST_CASE("FileTools - FileExists() - Existing file")
 {
+   FileTools::CreateDummyFile(L"existingFile", 2, true);
+
    bool exists = FileTools::FileExists("existingFile");
    REQUIRE( exists == true );
    exists = FileTools::FileExists(L"existingFile");
@@ -78,6 +80,8 @@ TEST_CASE("FileTools - FileExists() - Non existing file")
 
 TEST_CASE("FileTools - FolderExists() - Existing file")
 {
+   FileTools::CreateDummyFile(L"existingFile", 2, true);
+
    const bool exists = FileTools::FolderExists(L"existingFile");
    REQUIRE( exists == false );
 }
@@ -90,6 +94,8 @@ TEST_CASE("FileTools - FolderExists() - Non existing file")
 
 TEST_CASE("FileTools - FolderExists() - Existing folder")
 {
+   FileTools::CreateFolder(L"existingFolder");
+
    const bool exists = FileTools::FileExists(L"existingFolder");
    REQUIRE( exists == true );
 }
@@ -183,7 +189,7 @@ TEST_CASE("FileTools - WriteBufferToFile()/GetTextFileContent() - unicode data")
 
 TEST_CASE("FileTools - WriteBufferToFile() - unicode path")
 {
-   const wstring testFilename = L"Micka\x00ebl/fileWithUnicodeFolderInPath2.txt";
+   const wstring testFilename = L"fileUnicodeMicka\x00ebl.txt";
 
    if (FileTools::FileExists(testFilename))
    {
