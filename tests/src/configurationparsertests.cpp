@@ -20,44 +20,50 @@
 
 #include "configurationparser.h"
 #include "configurationparseroutput.h"
-#include "filetools.h"
+#include "stringtools.h"
 
 using namespace std;
 
 //-------------------------------------------------------------------------
 
 namespace  {
-   wstring DataFile(const wstring& filename)
-   {
-      const wstring dataFolder = L"ConfigurationParser/";
-      return dataFolder + filename;
-   }
-
-   wstring GetDescriptionContent(const ParserOutput& output)
-   {
-      const wstring fullFilename = DataFile(output.GetDescriptionFile());
-      return FileTools::GetTextFileContent(fullFilename);
-   }
+   const string standardDataDescription = "Anonymous object :\n\
+\tName : \n\
+\t[Property] ReportType : console|html\n\
+\t[Property] SendReportByEmail : true\n\
+\t[Property] ShutdownOnFinish : true\n\
+\t[Property] email : mickael.dacruz@gmail.com\n\
+Object\n\
+\tName : Me\n\
+\t[Property] Name : Cristiana Araujo\n\
+\t[Property] UseSSL : true\n\
+Object\n\
+\tName : Client\n\
+\t[Property] Name : Desktop computer\n\
+\t[Property] broadcast : 192.168.1.255\n\
+\t[Property] sshuser : remotebackup\n\
+\tObject\n\
+\t\tName : JobList\n\
+\t\tObject\n\
+\t\t\tName : Wake\n\
+\t\tObject\n\
+\t\t\tName : Backup\n\
+\t\tObject\n\
+\t\t\tName : ClamAv\n\
+\t\tObject\n\
+\t\t\tName : ChangeScreenSaver\n\
+\t\tObject\n\
+\t\t\tName : Shutdown\n";
 
    void testParseFile(const wstring& filename, const ParserOutput& expectedOutput)
    {
       ConfigurationParser parser;
       vector<wstring> errors;
-      const bool result = parser.ParseFile(DataFile(filename), errors);
-      const wstring expectedDescription = GetDescriptionContent(expectedOutput);
+      const bool result = parser.ParseFile(filename, errors);
 
       REQUIRE(expectedOutput.GetResult() == result);
       REQUIRE(expectedOutput.GetErrorMessages() == errors);
-      REQUIRE(expectedDescription == parser.GetFullDescription());
-   }
-
-   void testParseFileOk(const wstring& testName)
-   {
-      const wstring extension = L".txt";
-      const wstring inputFile = L"ok_" + testName + extension;
-      const wstring expectedOutputFile = L"ok_" + testName + L"_expectedContent" + extension;
-      const ParserOutput expectedOutput = ParserOutput::CreateAsOk(expectedOutputFile);
-      testParseFile(inputFile, expectedOutput);
+      REQUIRE(parser.GetFullDescription() == L"");
    }
 
    void testParseBufferOk(const wstring& input, const wstring& expectedDescription)
@@ -70,12 +76,32 @@ namespace  {
       REQUIRE(errors.size() == 0);
       REQUIRE(parser.GetFullDescription() == expectedDescription);
    }
+
+   void testParseBufferOk(const string& input, const string& expectedDescription)
+   {
+      const wstring wideInput = StringTools::Utf8ToUnicode(input);
+      const wstring wideDescription = StringTools::Utf8ToUnicode(expectedDescription);
+      testParseBufferOk(wideInput, wideDescription);
+   }
+
+   void testParseBufferError(const string& input, const ParserOutput& expectedOutput)
+   {
+      const wstring wideInput = StringTools::Utf8ToUnicode(input);
+      ConfigurationParser parser;
+      vector<wstring> errors;
+      const bool result = parser.ParseBuffer(wideInput, errors);
+
+      REQUIRE(expectedOutput.GetResult() == result);
+      REQUIRE(expectedOutput.GetErrorMessages() == errors);
+      REQUIRE(parser.GetFullDescription() == L"");
+   }
 }
 
 //-------------------------------------------------------------------------
 
 TEST_CASE("ConfigurationParser - Error - Non existent file")
 {
+   const wstring inputBuffer = L"";
    const wstring message = L"File could not be opened";
    const ParserOutput expectedOutput = ParserOutput::CreateAsError(message);
    testParseFile(L"nonexistentfile.txt", expectedOutput);
@@ -83,43 +109,210 @@ TEST_CASE("ConfigurationParser - Error - Non existent file")
 
 TEST_CASE("ConfigurationParser - Error - Missing close brace")
 {
+   const string inputBuffer = R"(
+   Me
+   {
+      Name = "Cristiana Araujo";
+      UseSSL = true;
+
+      Client
+      {
+         Name = "Desktop computer";
+         broadcast = "192.168.1.255";
+         sshuser = "remotebackup";
+         JobList
+         {
+            Wake();
+            Backup();
+            ClamAv();
+            ChangeScreenSaver();
+            Shutdown();
+         }
+      }
+
+      email = "mickael.dacruz@gmail.com";
+      ReportType = "console|html";
+      SendReportByEmail = true;
+      ShutdownOnFinish = true;)";
    const wstring message = L"Syntax error : missing }";
    const ParserOutput expectedOutput = ParserOutput::CreateAsError(message);
-   testParseFile(L"error_missingCloseBrace.txt", expectedOutput);
+   testParseBufferError(inputBuffer, expectedOutput);
 }
 
 TEST_CASE("ConfigurationParser - Error - Missing declaration end")
 {
+   const string inputBuffer = R"(
+   Me
+   {
+    Name = "Cristiana Araujo"
+    UseSSL = true;
+   })";
    const wstring message = L"Syntax error : Missing end declaration symbol";
    const ParserOutput expectedOutput = ParserOutput::CreateAsError(message);
-   testParseFile(L"error_missingEndDeclaration.txt", expectedOutput);
+   testParseBufferError(inputBuffer, expectedOutput);
 }
 
 TEST_CASE("ConfigurationParser - Error - No symbol between atoms")
 {
+   const string inputBuffer = R"(
+      This is a text file, nothing
+      to do with a configuration file.
+      Hahaha.)";
    const wstring message = L"Syntax error : two atoms without symbol between them!";
    const ParserOutput expectedOutput = ParserOutput::CreateAsError(message);
-   testParseFile(L"error_missingNoSymbolBetweenAtoms.txt", expectedOutput);
+   testParseBufferError(inputBuffer, expectedOutput);
 }
 
 TEST_CASE("ConfigurationParser - Ok - Normal")
 {
-   testParseFileOk(L"normal");
+   const string inputBuffer = R"(
+   Me
+   {
+       Name = "Cristiana Araujo";
+       UseSSL = true;
+   }
+
+   Client
+   {
+       Name = "Desktop computer";
+       broadcast = "192.168.1.255";
+       sshuser = "remotebackup";
+       JobList
+       {
+           Wake();
+           Backup();
+           ClamAv();
+           ChangeScreenSaver();
+           Shutdown();
+       }
+   }
+
+   email = "mickael.dacruz@gmail.com";
+   ReportType = "console|html";
+   SendReportByEmail = true;
+   ShutdownOnFinish = true;
+   )";
+
+   testParseBufferOk(inputBuffer, standardDataDescription);
 }
 
 TEST_CASE("ConfigurationParser - Ok - With inline creation")
 {
-   testParseFileOk(L"inlineCreation");
+   const string inputBuffer = R"(
+   Client
+   {
+       JobList
+       {
+         ConsoleJob("ls -l", true, false);
+         ConsoleJob
+         {
+            command = "ls -l";
+         }
+       }
+   }
+   )";
+   const string expectedDescription = "No anonymous object.\n\
+Object\n\
+\tName : Client\n\
+\tObject\n\
+\t\tName : JobList\n\
+\t\tObject\n\
+\t\t\tName : ConsoleJob\n\
+\t\t\t[Property] param0 : ls -l\n\
+\t\t\t[Property] param1 : true\n\
+\t\t\t[Property] param2 : false\n\
+\t\tObject\n\
+\t\t\tName : ConsoleJob\n\
+\t\t\t[Property] command : ls -l\n";
+
+   testParseBufferOk(inputBuffer, expectedDescription);
 }
 
 TEST_CASE("ConfigurationParser - Ok - With single line comment")
 {
-   testParseFileOk(L"singleLineComment");
+   const string inputBuffer = R"(Me
+{
+    Name = "Cristiana Araujo";
+    UseSSL = true;
+}
+
+// Comment on main
+
+Client
+{
+    // Comment inside object
+    Name = "Desktop computer";
+    broadcast = "192.168.1.255";// Comment on data line
+    sshuser = "remotebackup";
+    JobList
+    {
+        // Comment inside subovject
+        Wake();
+        Backup();
+        ClamAv();
+        ChangeScreenSaver();
+        Shutdown();
+    }
+}
+
+email = "mickael.dacruz@gmail.com";
+ReportType = "console|html";
+SendReportByEmail = true;
+ShutdownOnFinish = true;
+   )";
+
+   testParseBufferOk(inputBuffer, standardDataDescription);
 }
 
 TEST_CASE("ConfigurationParser - Ok - With multi line comment")
 {
-   testParseFileOk(L"multiLineComment");
+   const string inputBuffer = R"(Me
+{
+    Name = "Cristiana Araujo";
+    UseSSL = true;
+
+/*
+
+ Comment in object block
+ across multiple lines
+*/
+
+}
+
+/*
+
+ Comment in main block
+ across multiple lines
+*/
+
+Client
+{
+    Name = "Desktop computer";
+    broadcast = "192.168.1.255";
+    sshuser = "remotebackup";
+    JobList
+    {
+/*
+
+ Comment in sub object block
+ across multiple lines
+*/
+
+        Wake();
+        Backup();
+        ClamAv();
+        ChangeScreenSaver();
+        Shutdown(/*  Comenting inside params */);
+    }
+}
+
+email = "mickael.dacruz@gmail.com";
+ReportType = "console|html";
+SendReportByEmail = true;
+ShutdownOnFinish = true;
+   )";
+
+   testParseBufferOk(inputBuffer, standardDataDescription);
 }
 
 TEST_CASE("ConfigurationParser - Ok - Properties on anonymous objects")
