@@ -28,12 +28,6 @@ void Point<T, D>::SetY(const T value)
    coordinates[1] = value;
 }
 
-template<typename T, int D>
-void Point<T, D>::SetZ(const T value)
-{
-   coordinates[2] = value;
-}
-
 template <typename T, int D>
 T Point<T, D>::x() const
 {
@@ -44,12 +38,6 @@ template <typename T, int D>
 T Point<T, D>::y() const
 {
     return coordinates[1];
-}
-
-template <typename T, int D>
-T Point<T, D>::z() const
-{
-    return coordinates[2];
 }
 
 template <typename T, int D>

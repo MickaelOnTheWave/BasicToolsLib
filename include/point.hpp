@@ -12,11 +12,9 @@ public:
 
     void SetX(const T value);
     void SetY(const T value);
-    void SetZ(const T value);
 
     T x() const;
     T y() const;
-    T z() const;
 
     Point<T, D>& operator=(const Point<T, D>& param);
     Point<T, D> operator+(const Point<T, D>& param);

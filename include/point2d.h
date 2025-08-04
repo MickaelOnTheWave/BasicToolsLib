@@ -9,6 +9,7 @@ class Point2D
 public:
     Point2D();
     Point2D(const float _x, const float _y);
+    Point2D(const Point2D& other);
 
     Point2D& operator=(const Point2D& param);
     Point2D operator+(const Point2D& param);
