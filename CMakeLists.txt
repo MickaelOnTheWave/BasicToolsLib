@@ -20,3 +20,4 @@ endif(BuildTests)
 
 target_include_directories(BasicToolsLib PUBLIC "${includeDir}")
 
+add_custom_target(Other SOURCES LICENSE README.md)
