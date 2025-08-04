@@ -14,3 +14,4 @@ It also contains other utilities that are not listed here because they either ar
 don't really belong in this library and will be moved to another one in the future.
 
 
+*Note on automated tests*: They are not built by default. If you wish to enable them, set the Cmake variable BuildTests to True.
