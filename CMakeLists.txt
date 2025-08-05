@@ -12,7 +12,10 @@ set(includeDir "${projectRoot}/include")
 file(GLOB sources "${srcDir}/*")
 file(GLOB includes "${includeDir}/*")
 
-add_library(BasicToolsLib ${sources} ${includes})
+set (NonDevFiles LICENSE README.md)
+source_group("Non Dev Files" FILES ${NonDevFiles})
+
+add_library(BasicToolsLib ${sources} ${includes} ${NonDevFiles})
 
 if(BuildTests)
   add_subdirectory(tests)
@@ -20,4 +23,3 @@ endif(BuildTests)
 
 target_include_directories(BasicToolsLib PUBLIC "${includeDir}")
 
-add_custom_target(Other SOURCES LICENSE README.md)
