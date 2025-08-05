@@ -14,7 +14,7 @@ public:
 
     static bool FolderExists(const std::wstring& folderName);
 
-    static bool CreateDummyFile(const std::wstring& name, const size_t fileSize, const bool textOnly);
+    static bool CreateDummyFile(const std::string& name, const size_t fileSize, const bool textOnly);
 
     static bool CreateFolder(const std::wstring& folderName);
   

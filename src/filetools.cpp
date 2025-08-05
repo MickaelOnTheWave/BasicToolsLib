@@ -261,7 +261,7 @@ bool FileTools::FolderExists(const wstring &folderName)
         return false;
 }
 
-bool FileTools::CreateDummyFile(const wstring &name, const size_t fileSize, const bool textOnly)
+bool FileTools::CreateDummyFile(const string &name, const size_t fileSize, const bool textOnly)
 {
     if (FileExists(name))
         return false;
@@ -271,12 +271,15 @@ bool FileTools::CreateDummyFile(const wstring &name, const size_t fileSize, cons
     errno_t error = _wfopen_s(&file, name.c_str(), L"w");
     if (error == 0)
 #else
-    const string utf8Name = StringTools::UnicodeToUtf8(name);
-    FILE* file = fopen(utf8Name.c_str(), "w");
+    FILE* file = fopen(name.c_str(), "w");
     if (!file)
 #endif
         return false;
 
+    // TODO change the way it is created, because the data is too predictible :
+    // - Create a random dictionary
+    // - Add words from dictionary until we filled the required size
+    // - Get rid of "text only" param. Not useful.
     for (size_t dataPtr = 0; dataPtr < fileSize; ++dataPtr)
     {
         char val;
