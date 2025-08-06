@@ -62,7 +62,7 @@ namespace
 
 TEST_CASE("FileTools - FileExists() - Existing file")
 {
-   FileTools::CreateDummyFile(L"existingFile", 2, true);
+   FileTools::CreateDummyFile("existingFile", 2, true);
 
    bool exists = FileTools::FileExists("existingFile");
    REQUIRE( exists == true );
@@ -80,7 +80,7 @@ TEST_CASE("FileTools - FileExists() - Non existing file")
 
 TEST_CASE("FileTools - FolderExists() - Existing file")
 {
-   FileTools::CreateDummyFile(L"existingFile", 2, true);
+   FileTools::CreateDummyFile("existingFile", 2, true);
 
    const bool exists = FileTools::FolderExists(L"existingFile");
    REQUIRE( exists == false );
