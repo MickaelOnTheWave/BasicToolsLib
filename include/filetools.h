@@ -25,6 +25,7 @@ public:
      * @param folderName folder to remove.
      * @param keepRootFolder If true, foldername is not removed, only its contents.
      */
+    static bool RemoveFolder(const std::string& folderName, const bool keepRootFolder);
     static bool RemoveFolder(const std::wstring& folderName, const bool keepRootFolder);
 
     static bool MoveFileTo(const std::wstring& oldname, const std::wstring& newname);

@@ -145,6 +145,15 @@ bool LinuxIsFolderEmpty(const wstring& name)
 }
 #endif
 
+bool FileTools::RemoveFolder(const std::string &folderName, const bool keepRootFolder)
+{
+#ifdef _MSC_VER
+   return WindowsRemoveFolder(folderName);
+#else
+   return LinuxRemoveFolder(folderName, keepRootFolder);
+#endif
+}
+
 bool FileTools::RemoveFolder(const wstring &folderName, const bool keepRootFolder)
 {
 #ifdef _MSC_VER
