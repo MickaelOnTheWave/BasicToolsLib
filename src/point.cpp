@@ -10,6 +10,13 @@ Point<T, D>::Point()
 }
 
 template<typename T, int D>
+Point<T, D>::Point(const T x, const T y)
+{
+   coordinates[0] = x;
+   coordinates[1] = y;
+}
+
+template<typename T, int D>
 Point<T, D>::Point(const std::vector<T> &values)
 {
    for (int i=0; i<D; ++i)

@@ -8,6 +8,7 @@ class Point
 {
 public:
     Point();
+    Point(const T x, const T y);
     Point(const std::vector<T>& values);
 
     void SetX(const T value);
